@@ -65,7 +65,7 @@ async function start() {
 
 	let socket = new WebSocket(TRANSACTION_WSS_URL);
 	socket.onclose = () => { setTimeout(() => { start() }, 15*1000); wssErrorCount++;};
-	socket.onerror = () => { socket.close();  if(wssErrorCount == 10) { restartWss(); }};
+	socket.onerror = () => { socket.close();  //if(wssErrorCount == 10) { restartWss(); }};
 	socket.onmessage = async (msg) => {
 		wssErrorCount = 0;
 		const message = JSON.parse(msg.data);
@@ -1017,7 +1017,7 @@ app.get('/', async (req, res) => {
 		printString = printString + "<br/>";
 		for (let i = 0; i < CLONE_JSON[j].botsPublicKeys.length; i++) {
 			balanceBot = getAddressBalances(CLONE_JSON[j].botsPublicKeys[i]);
-			printString = printString + "-<b>Bot Address-------- " + CLONE_JSON[j].botsPublicKeys[i] + " -----Matic Balance: " + balanceBot.maticBalance + " ----- Dai Balance: " + balanceBot.diaBalance + " ------maxCollateral: " + parseInt(CLONE_JSON[j].maxCollateral).toString() + "--------</b><br/>\n";
+			printString = printString + " -----Matic Balance: " + balanceBot.maticBalance + " ----- Dai Balance: " + balanceBot.diaBalance + " ------maxCollateral: " + parseInt(CLONE_JSON[j].maxCollateral).toString() + "--------</b><br/>\n";
 			let botOpentrades = getAddressOpenTrades(CLONE_JSON[j].botsPublicKeys[i]);
 			for (let y = 0; y < botOpentrades.length; y++) {
 				printString = addOpenTradeToString(botOpentrades[y], printString) + "<br/>";
@@ -1028,53 +1028,53 @@ app.get('/', async (req, res) => {
 	res.send(printString);
 })
 
-app.get('/closeAllTrades', async (req, res) => {
-	const botOpenTrades = getBotOpenTrades();
-	let printString = "";
-	for (let i = 0; i < botOpenTrades.length; i++) {
-		let botOpenTrade = botOpenTrades[i];
-		if (isOpenTradeLimitTrade(botOpenTrade) == "limit") {
-			cancelOpenLimitOrderByOpenTrade(botOpenTrade.trader, botOpenTrade, "Force");
-		} else {
-			closeTradeMarketByOpenTrade(botOpenTrade.trader, botOpenTrade, "Force");
-		}
-	}
-	res.send("All Trades Closing");
-})
+// app.get('/closeAllTrades', async (req, res) => {
+// 	const botOpenTrades = getBotOpenTrades();
+// 	let printString = "";
+// 	for (let i = 0; i < botOpenTrades.length; i++) {
+// 		let botOpenTrade = botOpenTrades[i];
+// 		if (isOpenTradeLimitTrade(botOpenTrade) == "limit") {
+// 			cancelOpenLimitOrderByOpenTrade(botOpenTrade.trader, botOpenTrade, "Force");
+// 		} else {
+// 			closeTradeMarketByOpenTrade(botOpenTrade.trader, botOpenTrade, "Force");
+// 		}
+// 	}
+// 	res.send("All Trades Closing");
+// })
 
-app.get('/tradeData', async (req, res) => {
-	res.send(JSON.stringify(tradeData, null, '<br/>'));
-})
+// app.get('/tradeData', async (req, res) => {
+// 	res.send(JSON.stringify(tradeData, null, '<br/>'));
+// })
 
-app.get('/closeTrade/:address/:pairIndex/:index/:type', async (req, res) => {
-	const address = req.params.address.toLowerCase();
-	const pairIndex = req.params.pairIndex;
-	const index = req.params.index;
-	const type = req.params.type;
+// app.get('/closeTrade/:address/:pairIndex/:index/:type', async (req, res) => {
+// 	const address = req.params.address.toLowerCase();
+// 	const pairIndex = req.params.pairIndex;
+// 	const index = req.params.index;
+// 	const type = req.params.type;
 
-	const botOpenTrades = getBotOpenTrades();
-	for (let i = 0; i < botOpenTrades.length; i++) {
-		let botOpenTrade = botOpenTrades[i];
-		if (botOpenTrade.trader.toLowerCase() == address.toLowerCase() && botOpenTrade.index == index && botOpenTrade.pairIndex == pairIndex) {
-			if (type == "limit") {
-				cancelOpenLimitOrderByOpenTrade(botOpenTrade.trader, botOpenTrade, "Force");
-			} else if (type == "market") {
-				closeTradeMarketByOpenTrade(botOpenTrade.trader, botOpenTrade, "Force");
-			}
-			res.send("Closing: " + openTradeStrigify(botOpenTrade));
-			return;
-		}
-	}
-	res.send("Failed to close trade.");
-})
+// 	const botOpenTrades = getBotOpenTrades();
+// 	for (let i = 0; i < botOpenTrades.length; i++) {
+// 		let botOpenTrade = botOpenTrades[i];
+// 		if (botOpenTrade.trader.toLowerCase() == address.toLowerCase() && botOpenTrade.index == index && botOpenTrade.pairIndex == pairIndex) {
+// 			if (type == "limit") {
+// 				cancelOpenLimitOrderByOpenTrade(botOpenTrade.trader, botOpenTrade, "Force");
+// 			} else if (type == "market") {
+// 				closeTradeMarketByOpenTrade(botOpenTrade.trader, botOpenTrade, "Force");
+// 			}
+// 			res.send("Closing: " + openTradeStrigify(botOpenTrade));
+// 			return;
+// 		}
+// 	}
+// 	res.send("Failed to close trade.");
+// })
 
-app.get('/transferDai/:amount/:from/:to', async (req, res) => {
-	const to = req.params.to.toLowerCase();
-	const from = req.params.from.toLowerCase();
-	const amount = parseInt(req.params.amount);
+// app.get('/transferDai/:amount/:from/:to', async (req, res) => {
+// 	const to = req.params.to.toLowerCase();
+// 	const from = req.params.from.toLowerCase();
+// 	const amount = parseInt(req.params.amount);
 
-	res.send(await transferDai(to, from, amount));
-})
+// 	res.send(await transferDai(to, from, amount));
+// })
 
 
 async function transferDai(to, from, amount) {
