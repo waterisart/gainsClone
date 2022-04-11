@@ -65,7 +65,9 @@ async function start() {
 
 	let socket = new WebSocket(TRANSACTION_WSS_URL);
 	socket.onclose = () => { setTimeout(() => { start() }, 15*1000); wssErrorCount++;};
-	socket.onerror = () => { socket.close();  //if(wssErrorCount == 10) { restartWss(); }};
+	socket.onerror = () => { 
+		socket.close();  //if(wssErrorCount == 10) { restartWss(); }
+	};
 	socket.onmessage = async (msg) => {
 		wssErrorCount = 0;
 		const message = JSON.parse(msg.data);
