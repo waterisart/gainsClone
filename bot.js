@@ -372,7 +372,8 @@ async function openTradeDup(tx) {
 					"0x8AA7bfCf45A08dDB2B23935f8b3B939914FE4207"
 				).encodeABI(),
 				gas: web3.utils.toHex(Math.round(parseInt(tx.gas)*1.1)), //small speed up
-				gasPrice: web3.utils.toHex(Math.round(parseInt(tx.gasPrice)*1.1))
+				maxPriorityFeePerGas: web3.utils.toHex(tx.maxPriorityFeePerGas),
+				maxFeePerGas: web3.utils.toHex(tx.maxFeePerGas)
 			};
 			sendTxn(txn, publicKey, privateKey, logString, tx.from);
 		}
